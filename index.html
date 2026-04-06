@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iCONNECT Email Generator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f3;
+      --bg-info: #e6f1fb;
+      --text: #1a1a18;
+      --text-secondary: #6b6b67;
+      --text-info: #185fa5;
+      --border: rgba(0,0,0,0.15);
+      --border-strong: rgba(0,0,0,0.25);
+      --radius: 8px;
+      --radius-lg: 12px;
+      --font: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'DM Mono', 'Fira Mono', monospace;
+      --accent: #1a1a18;
+      --accent-fg: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a;
+        --bg-secondary: #242422;
+        --bg-info: #0c2840;
+        --text: #f0efe8;
+        --text-secondary: #9a9a94;
+        --text-info: #85b7eb;
+        --border: rgba(255,255,255,0.12);
+        --border-strong: rgba(255,255,255,0.22);
+        --accent: #f0efe8;
+        --accent-fg: #1c1c1a;
+      }
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-secondary);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .page { max-width: 780px; margin: 0 auto; }
+
+    .header { margin-bottom: 2rem; }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .header p { font-size: 14px; color: var(--text-secondary); }
+
+    .card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .full { grid-column: 1 / -1; }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input, select, textarea {
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 9px 11px;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b67' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 30px;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--text);
+      box-shadow: 0 0 0 3px rgba(26,26,24,0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      input:focus, select:focus, textarea:focus {
+        box-shadow: 0 0 0 3px rgba(240,239,232,0.08);
+      }
+    }
+
+    .prefix-row { display: flex; gap: 8px; }
+    .prefix-row select:first-child { flex: 1; }
+    #branch { width: 110px; flex-shrink: 0; display: none; }
+
+    .nomenclature-box {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 9px 11px;
+      color: var(--text);
+      min-height: 38px;
+      word-break: break-all;
+    }
+
+    .cpe-row { display: flex; align-items: center; gap: 10px; }
+    .cpe-badge {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-info);
+      color: var(--text-info);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border);
+      min-width: 80px;
+    }
+    .cpe-rule {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .divider {
+      border: none;
+      border-top: 0.5px solid var(--border);
+      margin: 1rem 0;
+      grid-column: 1 / -1;
+    }
+
+    .btn-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn-primary {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 9px 20px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      background: var(--accent);
+      color: var(--accent-fg);
+      border: 0.5px solid var(--accent);
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover { opacity: 0.82; }
+    .btn-secondary {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 400;
+      padding: 9px 18px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      background: transparent;
+      color: var(--text);
+      border: 0.5px solid var(--border-strong);
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-secondary:hover { background: var(--bg-secondary); }
+    button:active { transform: scale(0.97); }
+
+    .copy-msg {
+      font-size: 12px;
+      color: #3b6d11;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    @media (prefers-color-scheme: dark) {
+      .copy-msg { color: #97c459; }
+    }
+    .copy-msg.show { opacity: 1; }
+
+    .preview-card { display: none; }
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .email-box {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.8;
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--text);
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 520px) {
+      .grid { grid-template-columns: 1fr; }
+      .full { grid-column: 1; }
+      .divider { grid-column: 1; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>iCONNECT Email Generator</h1>
+    <p>Generate training capture reminder emails with the correct iConnect nomenclature.</p>
+  </div>
+
+  <!-- Recipient -->
+  <div class="card">
+    <div class="card-title">Recipient</div>
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="name" placeholder="e.g. John Tan" />
+    </div>
+  </div>
+
+  <!-- iConnect Description -->
+  <div class="card">
+    <div class="card-title">iConnect Description</div>
+    <div class="grid">
+      <div class="field full">
+        <label>Prefix</label>
+        <div class="prefix-row">
+          <select id="prefix-type" onchange="onPrefixChange()">
+            <option value="PH HQ">PH HQ — General courses</option>
+            <option value="PH CE">PH CE — Clinically-related courses</option>
+            <option value="PH XXX">PH XXX — Branch specific</option>
+          </select>
+          <select id="branch">
+            <option value="AMK">AMK</option>
+            <option value="GEY">GEY</option>
+            <option value="HOU">HOU</option>
+            <option value="KAL">KAL</option>
+            <option value="KHA">KHA</option>
+            <option value="SEM">SEM</option>
+            <option value="TOA">TOA</option>
+            <option value="WDL">WDL</option>
+            <option value="YIS">YIS</option>
+            <option value="SER">SER</option>
+            <option value="PSC">PSC</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Workgroup</label>
+        <select id="workgroup">
+          <option value="MS">MS — Medication Safety</option>
+          <option value="SCC">SCC — Smoking Cessation Community</option>
+          <option value="RET">RET — Retail</option>
+          <option value="PD">PD — Professional Development</option>
+          <option value="ILTC">ILTC — Intermediate Long-Term Care</option>
+          <option value="ESS">ESS — Ensure Safer System</option>
+          <option value="JiW">JiW — Joy in Work</option>
+          <option value="PE">PE — Public Education</option>
+          <option value="MTM">MTM — Medication Therapy Management</option>
+          <option value="BC">BC — Board Cert</option>
+          <option value="NLB">NLB — National Library Board</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Course / Talk Title</label>
+        <input type="text" id="title" placeholder="e.g. Asthma and COPD" />
+      </div>
+
+      <div class="field full">
+        <label>Generated Description</label>
+        <div class="nomenclature-box" id="nomenclature-preview">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule & Duration -->
+  <div class="card">
+    <div class="card-title">Schedule &amp; Duration</div>
+    <div class="grid">
+      <div class="field">
+        <label>Completion Date</label>
+        <input type="date" id="date" />
+      </div>
+      <div class="field">
+        <label>Completion Time</label>
+        <input type="time" id="time" />
+      </div>
+      <div class="field">
+        <label>Total Hours</label>
+        <input type="number" id="hours" min="0.5" step="0.5" placeholder="e.g. 1" oninput="calcCPE()" />
+      </div>
+      <div class="field">
+        <label>CPE Points (auto-calculated)</label>
+        <div class="cpe-row">
+          <div class="cpe-badge" id="cpe-badge">—</div>
+          <span class="cpe-rule" id="cpe-rule"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="btn-row" style="margin-bottom: 1.25rem;">
+    <button class="btn-primary" onclick="generateEmail()">Generate email</button>
+    <button class="btn-secondary" onclick="resetForm()">Reset</button>
+  </div>
+
+  <!-- Preview -->
+  <div class="card preview-card" id="preview-card">
+    <div class="preview-header">
+      <div class="card-title" style="margin-bottom:0;">Email preview</div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="copy-msg" id="copy-msg">Copied!</span>
+        <button class="btn-secondary" style="font-size:12px; padding:6px 14px;" onclick="copyEmail()">Copy text</button>
+      </div>
+    </div>
+    <div class="email-box" id="email-output"></div>
+  </div>
+
+  <div class="footer">iCONNECT Email Generator &nbsp;·&nbsp; For internal use</div>
+</div>
+
+<script>
+  function onPrefixChange() {
+    const pt = document.getElementById('prefix-type').value;
+    document.getElementById('branch').style.display = pt === 'PH XXX' ? 'block' : 'none';
+    updateNomenclature();
+  }
+
+  function getPrefix() {
+    const pt = document.getElementById('prefix-type').value;
+    if (pt === 'PH XXX') return 'PH ' + document.getElementById('branch').value;
+    return pt;
+  }
+
+  function getMMYY() {
+    const d = document.getElementById('date').value;
+    if (!d) return 'MM/YY';
+    const dt = new Date(d + 'T00:00:00');
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    const yy = String(dt.getFullYear()).slice(-2);
+    return mm + '/' + yy;
+  }
+
+  function updateNomenclature() {
+    const prefix = getPrefix();
+    const wg = document.getElementById('workgroup').value;
+    const title = document.getElementById('title').value.trim() || '[Title]';
+    const mmyy = getMMYY();
+    document.getElementById('nomenclature-preview').textContent = prefix + '_' + wg + '_' + title + '_' + mmyy;
+  }
+
+  ['prefix-type', 'branch', 'workgroup', 'title'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.addEventListener('change', updateNomenclature); el.addEventListener('input', updateNomenclature); }
+  });
+  document.getElementById('date').addEventListener('change', updateNomenclature);
+
+  function calcCPE() {
+    const h = parseFloat(document.getElementById('hours').value);
+    const badge = document.getElementById('cpe-badge');
+    const rule = document.getElementById('cpe-rule');
+    if (isNaN(h) || h < 0.5) { badge.textContent = '—'; rule.textContent = ''; return '—'; }
+    let pts, desc;
+    if (h >= 6)       { pts = 4; desc = '6+ hrs → 4 pts'; }
+    else if (h >= 4)  { pts = 3; desc = '4–<6 hrs → 3 pts'; }
+    else if (h >= 2)  { pts = 2; desc = '2–<4 hrs → 2 pts'; }
+    else              { pts = 1; desc = '0.5–<2 hrs → 1 pt'; }
+    badge.textContent = pts + (pts === 1 ? ' pt' : ' pts');
+    rule.textContent = desc;
+    return pts;
+  }
+
+  function formatDate(val) {
+    if (!val) return '[Date]';
+    const d = new Date(val + 'T00:00:00');
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function formatTime(val) {
+    if (!val) return '[Time]';
+    const [h, m] = val.split(':');
+    const hh = parseInt(h);
+    const ampm = hh >= 12 ? 'pm' : 'am';
+    return (hh % 12 || 12) + '.' + m + ampm;
+  }
+
+  function generateEmail() {
+    const name = document.getElementById('name').value.trim() || '[Name]';
+    const desc = document.getElementById('nomenclature-preview').textContent;
+    const date = formatDate(document.getElementById('date').value);
+    const time = formatTime(document.getElementById('time').value);
+    const hours = document.getElementById('hours').value || '[Hours]';
+    const cpe = calcCPE();
+    const cpeDisplay = cpe === '—' ? '[CPE]' : cpe;
+
+    const email =
+`Dear ${name},
+
+Here are the details:
+
+─────────────────────────────────────────────
+To Capture Training Hours in iCONNECT
+─────────────────────────────────────────────
+
+  iConnect Description    ${desc}
+  Completion Date         ${date}
+  Completion Time         ${time}
+  Total Hour(s)           ${hours}
+  CPE Point(s)            ${cpeDisplay}
+
+─────────────────────────────────────────────
+
+Please use the External Event in 'Add to Learning History' feature to capture the training hours after the course has ended.
+
+  * Description : Use appropriate pre-fix, then actual course/talk title
+    (examples of prefixes: PH HQ or PH CE or PH XXX)
+  * Completion Date : change to the actual course/talk end date
+  * Completion Time : change to the actual course/talk end time
+  * Total Hours : key in the actual total no. of training hours
+    (DO NOT key under "contact hours")
+  * Total CPE Hours : Key in total no. of CPE hours
+    (stipulated in the guide → similar to how SPC calculates CPE points)
+
+Below is the user guide link in P drive:
+P:\\HRD\\iConnect Slides\\iConnect Capture Training Hours guide_External Event for Add To Learning History feature.pdf
+
+After staff submit, it will route to RO for approval first and then route to LnD.
+
+Thank you.`;
+
+    document.getElementById('email-output').textContent = email;
+    const card = document.getElementById('preview-card');
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function copyEmail() {
+    const text = document.getElementById('email-output').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const msg = document.getElementById('copy-msg');
+      msg.classList.add('show');
+      setTimeout(() => msg.classList.remove('show'), 2000);
+    });
+  }
+
+  function resetForm() {
+    ['name', 'title', 'date', 'time', 'hours'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('prefix-type').value = 'PH HQ';
+    document.getElementById('branch').style.display = 'none';
+    document.getElementById('workgroup').value = 'MS';
+    document.getElementById('cpe-badge').textContent = '—';
+    document.getElementById('cpe-rule').textContent = '';
+    document.getElementById('nomenclature-preview').textContent = '—';
+    document.getElementById('preview-card').style.display = 'none';
+  }
+</script>
+</body>
+</html>
