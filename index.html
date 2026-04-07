@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training Registration – Email Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f4f0;
+      --surface: #ffffff;
+      --surface-2: #f9f8f5;
+      --border: #e4e2db;
+      --border-focus: #b0a898;
+      --text-primary: #1a1916;
+      --text-secondary: #6b6860;
+      --text-tertiary: #9e9c97;
+      --accent: #2d5a3d;
+      --accent-light: #e8f0ea;
+      --accent-text: #1e3f2a;
+      --info-bg: #edf2ff;
+      --info-text: #2c4a8c;
+      --warn-bg: #fff8e6;
+      --warn-text: #7a5200;
+      --danger-bg: #fff0f0;
+      --danger-text: #8c2c2c;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .page-wrap {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      color: var(--text-primary);
+    }
+
+    header p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-tertiary);
+      margin-bottom: 1.25rem;
+    }
+
+    .field { margin-bottom: 1rem; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="time"],
+    select {
+      width: 100%;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface-2);
+      color: var(--text-primary);
+      appearance: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(45,90,61,.1);
+      background: var(--surface);
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e9c97' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .hint {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 5px;
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+    }
+
+    .hint::before {
+      content: "ⓘ";
+      flex-shrink: 0;
+      font-size: 12px;
+      margin-top: 1px;
+    }
+
+    /* Course cards */
+    .course-list { margin-bottom: .75rem; }
+
+    .course-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-bottom: .75rem;
+      position: relative;
+      transition: border-color .2s;
+    }
+
+    .course-card:hover { border-color: var(--border-focus); }
+
+    .course-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .course-num {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .remove-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-tertiary);
+      font-size: 13px;
+      padding: 3px 8px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+
+    .remove-btn:hover {
+      background: var(--danger-bg);
+      color: var(--danger-text);
+      border-color: #f5b8b8;
+    }
+
+    .add-course-btn {
+      width: 100%;
+      padding: 10px;
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s, color .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .add-course-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .cpe-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--accent-light);
+      color: var(--accent-text);
+      margin-top: 6px;
+    }
+
+    .iconnect-preview-wrap {
+      margin-top: .75rem;
+      padding: .75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    .iconnect-preview-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+
+    .iconnect-preview-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      word-break: break-all;
+    }
+
+    /* Generate button */
+    .generate-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: -.01em;
+      transition: background .15s, transform .1s;
+      margin-top: .5rem;
+    }
+
+    .generate-btn:hover { background: #235031; }
+    .generate-btn:active { transform: scale(.99); }
+
+    /* Preview section */
+    #preview-section { display: none; margin-top: 1.5rem; }
+
+    .preview-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .preview-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-2);
+    }
+
+    .preview-header-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .copy-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent-text);
+    }
+
+    .copy-btn.copied {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent-text);
+    }
+
+    .subject-bar {
+      padding: .875rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .subject-bar strong { color: var(--text-primary); font-weight: 500; }
+
+    .email-body {
+      padding: 1.5rem;
+      font-size: 14px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+      .row2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header>
+    <h1>Training Registration – Email Generator</h1>
+    <p>Generate standardised iConnect training registration emails</p>
+  </header>
+
+  <!-- Email details -->
+  <div class="card">
+    <div class="card-title">Email details</div>
+    <div class="field">
+      <label for="recipient">Recipient name</label>
+      <input type="text" id="recipient" placeholder="e.g. Pharmacy Team">
+    </div>
+    <div class="field">
+      <label for="designation">Job designation</label>
+      <input type="text" id="designation" placeholder="e.g. Pharmacist, Pharmacy Technician">
+    </div>
+  </div>
+
+  <!-- Course listings -->
+  <div class="card">
+    <div class="card-title">Course listing(s)</div>
+    <div class="course-list" id="courses-container"></div>
+    <button class="add-course-btn" onclick="addCourse()">
+      <span style="font-size:18px;line-height:1">+</span> Add course listing
+    </button>
+  </div>
+
+  <button class="generate-btn" onclick="generateEmail()">Generate email</button>
+
+  <!-- Preview -->
+  <div id="preview-section">
+    <div class="preview-card">
+      <div class="preview-header">
+        <span class="preview-header-title">Generated email</span>
+        <button class="copy-btn" id="copy-btn" onclick="copyEmail()">Copy to clipboard</button>
+      </div>
+      <div class="subject-bar"><strong>Subject:</strong> <span id="subj-out"></span></div>
+      <div class="email-body" id="email-out"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const WORKGROUPS = [
+    { label: "Medication Safety", abbr: "MS" },
+    { label: "Smoking Cessation Community", abbr: "SCC" },
+    { label: "Retail", abbr: "RET" },
+    { label: "Professional Development", abbr: "PD" },
+    { label: "Intermediate Long-Term Care", abbr: "ILTC" },
+    { label: "Ensure Safer System", abbr: "ESS" },
+    { label: "Joy in Work", abbr: "JiW" },
+    { label: "Public Education", abbr: "PE" },
+    { label: "Medication Therapy Management", abbr: "MTM" },
+    { label: "Board Certification", abbr: "BC" },
+    { label: "National Library Board", abbr: "NLB" }
+  ];
+
+  const BRANCHES = ["AMK", "GEY", "HOU", "KAL", "KHA", "SEM", "TOA", "WDL", "YIS", "SER", "PSC"];
+
+  let courseCount = 0;
+
+  function calcCPE(h) {
+    const n = parseFloat(h) || 0;
+    if (n >= 6) return 4;
+    if (n >= 4) return 3;
+    if (n >= 2) return 2;
+    if (n >= 0.5) return 1;
+    return 0;
+  }
+
+  function getMMYY(dateStr) {
+    if (!dateStr) return "MM/YY";
+    const d = new Date(dateStr);
+    if (isNaN(d)) return "MM/YY";
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yy = String(d.getFullYear()).slice(-2);
+    return mm + "/" + yy;
+  }
+
+  function buildIConnect(id) {
+    const prefix = document.getElementById("prefix_" + id).value;
+    const branchEl = document.getElementById("branch_" + id);
+    const wg = document.getElementById("wg_" + id).value;
+    const title = (document.getElementById("title_" + id).value || "").trim();
+    const date = document.getElementById("date_" + id).value;
+
+    let prefixStr = prefix;
+    if (prefix === "PH XXX" && branchEl && branchEl.value) prefixStr = "PH " + branchEl.value;
+
+    const mmyy = getMMYY(date);
+    return [prefixStr, wg || null, title || "[Title]", mmyy].filter(Boolean).join("_");
+  }
+
+  function isCPEPrefix(id) {
+    return document.getElementById("prefix_" + id).value === "PH CE";
+  }
+
+  function updatePreview(id) {
+    const ic = buildIConnect(id);
+    const el = document.getElementById("ic_preview_" + id);
+    if (el) el.textContent = ic || "–";
+
+    const badge = document.getElementById("cpe_" + id);
+    if (badge) {
+      if (isCPEPrefix(id)) {
+        const hrs = document.getElementById("hours_" + id).value;
+        const cpe = calcCPE(hrs);
+        badge.textContent = "✓ " + cpe + " CPE point" + (cpe !== 1 ? "s" : "");
+        badge.style.display = "inline-flex";
+      } else {
+        badge.style.display = "none";
+      }
+    }
+  }
+
+  function toggleBranch(id) {
+    const p = document.getElementById("prefix_" + id).value;
+    const bf = document.getElementById("branch_field_" + id);
+    if (bf) bf.style.display = (p === "PH XXX") ? "block" : "none";
+  }
+
+  function addCourse() {
+    courseCount++;
+    const id = courseCount;
+    const container = document.getElementById("courses-container");
+    const div = document.createElement("div");
+    div.className = "course-card";
+    div.id = "course_" + id;
+
+    const wgOptions = `<option value="">— None —</option>` + WORKGROUPS.map(w =>
+      `<option value="${w.abbr}">${w.label} (${w.abbr})</option>`
+    ).join("");
+
+    const branchOptions = BRANCHES.map(b =>
+      `<option value="${b}">${b}</option>`
+    ).join("");
+
+    div.innerHTML = `
+      <div class="course-header">
+        <span class="course-num">Listing #${id}</span>
+        ${id > 1 ? `<button class="remove-btn" onclick="removeCourse(${id})">Remove</button>` : ""}
+      </div>
+      <div class="field">
+        <label>Prefix</label>
+        <select id="prefix_${id}" onchange="toggleBranch(${id}); updatePreview(${id})">
+          <option value="PH HQ">PH HQ – General courses</option>
+          <option value="PH CE">PH CE – Clinically-related courses</option>
+          <option value="PH XXX">PH XXX – Branch-specific courses</option>
+        </select>
+        <div class="hint">Unsure whether PH HQ or PH CE? Check with the course owner.</div>
+      </div>
+      <div class="field" id="branch_field_${id}" style="display:none">
+        <label>Branch</label>
+        <select id="branch_${id}" onchange="updatePreview(${id})">${branchOptions}</select>
+      </div>
+      <div class="field">
+        <label>Workgroup / Clinical Taskgroup</label>
+        <select id="wg_${id}" onchange="updatePreview(${id})">${wgOptions}</select>
+      </div>
+      <div class="field">
+        <label>Course / Talk title</label>
+        <input type="text" id="title_${id}" placeholder="e.g. Medication Safety Workshop" oninput="updatePreview(${id})">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Completion date</label>
+          <input type="date" id="date_${id}" onchange="updatePreview(${id})">
+        </div>
+        <div class="field">
+          <label>Completion time</label>
+          <input type="time" id="time_${id}">
+        </div>
+      </div>
+      <div class="field">
+        <label>Total training hours</label>
+        <input type="number" id="hours_${id}" min="0.5" step="0.5" placeholder="e.g. 2.5" oninput="updatePreview(${id})">
+        <div class="cpe-pill" id="cpe_${id}">0 CPE points</div>
+      </div>
+      <div class="iconnect-preview-wrap">
+        <div class="iconnect-preview-label">iConnect description preview</div>
+        <div class="iconnect-preview-value" id="ic_preview_${id}">–</div>
+      </div>
+    `;
+
+    container.appendChild(div);
+  }
+
+  function removeCourse(id) {
+    const el = document.getElementById("course_" + id);
+    if (el) el.remove();
+  }
+
+  function fmtDate(d) {
+    if (!d) return "[Date]";
+    const dt = new Date(d + "T00:00:00");
+    return dt.toLocaleDateString("en-SG", { day: "numeric", month: "long", year: "numeric" });
+  }
+
+  function fmtTime(t) {
+    if (!t) return "[Time]";
+    const [h, m] = t.split(":");
+    const hr = parseInt(h);
+    const ampm = hr >= 12 ? "pm" : "am";
+    const h12 = hr % 12 || 12;
+    return h12 + ":" + (m || "00") + ampm;
+  }
+
+  function generateEmail() {
+    const recipient = document.getElementById("recipient").value.trim() || "[Recipient Name]";
+    const designation = document.getElementById("designation").value.trim() || "[Job Designation]";
+
+    const cards = document.querySelectorAll(".course-card");
+    if (cards.length === 0) {
+      alert("Please add at least one course listing.");
+      return;
+    }
+
+    const listings = [];
+    cards.forEach(card => {
+      const id = card.id.replace("course_", "");
+      const prefix = document.getElementById("prefix_" + id).value;
+      const showCPE = prefix === "PH CE";
+      const ic = buildIConnect(id);
+      const date = document.getElementById("date_" + id).value;
+      const time = document.getElementById("time_" + id).value;
+      const hrs = document.getElementById("hours_" + id).value;
+      const cpe = showCPE ? calcCPE(hrs) : null;
+      listings.push({ ic, date: fmtDate(date), time: fmtTime(time), hours: hrs || "[Hours]", cpe });
+    });
+
+    const multi = listings.length > 1;
+    let bodyEvents = "";
+    listings.forEach((l, i) => {
+      if (multi) bodyEvents += `Listing ${i + 1}\n`;
+      bodyEvents += `  iConnect Description (Course/Talk Title): ${l.ic}\n`;
+      bodyEvents += `  Completion Date: ${l.date}\n`;
+      bodyEvents += `  Completion Time: ${l.time}\n`;
+      bodyEvents += `  Total Hour(s): ${l.hours}\n`;
+      if (l.cpe !== null) bodyEvents += `  CPE Point(s): ${l.cpe}\n`;
+      if (i < listings.length - 1) bodyEvents += "\n";
+    });
+
+    const isAre = listings.length > 1 ? "are" : "is";
+    const eventsWord = listings.length > 1 ? "events" : "event";
+
+    const subject = "Training Registration – iConnect Capture";
+    const body = `Dear ${recipient},
+
+The following ${eventsWord} is/are open to ${designation}. Self-registration is required.
+
+To capture training hours in iConnect:
+
+${bodyEvents}
+Please use the External Event in the "Add to Learning History" feature to capture the training hours after the course has ended.
+
+Guidelines:
+• Description: Use the appropriate prefix, followed by the actual course/talk title
+• Completion Date: Actual course end date
+• Completion Time: Actual course end time
+• Total Hours: Enter the actual total number of training hours (do not key under "Contact Hours")
+• Total CPE Hours: Auto-calculated by the system
+
+After submission, the request will route to the Reporting Officer (RO) for approval, followed by LnD.
+
+Thank you.`;
+
+    document.getElementById("subj-out").textContent = subject;
+    document.getElementById("email-out").textContent = body;
+
+    const section = document.getElementById("preview-section");
+    section.style.display = "block";
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function copyEmail() {
+    const subj = document.getElementById("subj-out").textContent;
+    const body = document.getElementById("email-out").textContent;
+    const full = "Subject: " + subj + "\n\n" + body;
+    navigator.clipboard.writeText(full).then(() => {
+      const btn = document.getElementById("copy-btn");
+      btn.textContent = "Copied!";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = "Copy to clipboard";
+        btn.classList.remove("copied");
+      }, 2000);
+    });
+  }
+
+  // Initialise with one listing
+  addCourse();
+</script>
+</body>
+</html>
